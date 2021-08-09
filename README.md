@@ -1,7 +1,7 @@
 xo-gd
 ===============================
 
-version number: 3.1.4.01
+version number: 3.1.4.2
 author: Tami Bar
 
 Overview
@@ -21,7 +21,7 @@ Or clone the repo:
 
     $ git clone https://github.com/fire17/xo-gd.git
     $ python setup.py install
-    
+
 Contributing
 ------------
 

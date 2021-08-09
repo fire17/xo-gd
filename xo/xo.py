@@ -11,7 +11,8 @@ import os.path as PATH
 import os
 import re
 
-import .fileWatch as fW
+import fileWatch as fW
+print(" ::: imported xo successfully ")
 
 
 class SelfNamed(object):
