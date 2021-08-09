@@ -10,11 +10,13 @@
     b. open an account over on TestPyPi: https://test.pypi.org/account/register/
     c. open a repo
     d. have correct ~.pypirc file
-    python setup.py sdist upload
 
+
+    python setup.py sdist
     twine upload -r pypitest dist/*
-    Upload to PyPI:
     twine upload dist/*
+
+    Upload to PyPI:
 
     ######################
         THEN DO IT ALL ON GITHUB, new release, publish
