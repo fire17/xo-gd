@@ -29,7 +29,7 @@ git add -A
 git commit -m 'Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Supports Fast Prototyping To Large Scale Systems'
 git remote add origin https://github.com:fire17/xo-gd.git
 git push -u origin master
-git tag 3.1.3 -m 'GlobalData and XObject - Version 3 - Starlight'
+git tag 3.1.3.02 -m 'GlobalData and XObject - Version 3 - Starlight'
 git push --tags origin master
 5.
     cd ~
