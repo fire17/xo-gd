@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import time, os
 from datetime import *
-from gd import *
+from .gd import *
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 

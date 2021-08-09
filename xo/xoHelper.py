@@ -1,5 +1,5 @@
-from osCommands import *
-from xo import *
+from .osCommands import *
+from .xo import *
 
 import platform, sys
 import subprocess

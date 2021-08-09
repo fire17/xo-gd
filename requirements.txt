@@ -1,5 +1,8 @@
-gitdb2==3.0.1
-psutil==5.4.2
-traceback
+# Dev/Deployment
+sphinx
+sphinx_rtd_theme
+nose
+coverage
+pypi-publisher
 dill
 GitPython

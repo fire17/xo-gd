@@ -1,4 +1,4 @@
-Welcome to XObject + GlobalData's documentation!
+Welcome to xo-gd's documentation!
 =========================================
 
 Contents:

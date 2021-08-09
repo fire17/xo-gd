@@ -3,10 +3,10 @@ import requests
 import git
 from git import Repo
 # import fileWatch
-from xo import *
+from .xo import *
 
-from osCommands import os_command
-from osCommands import *
+from .osCommands import os_command
+from .osCommands import *
 
 from functools import reduce  # Required in Python 3
 import operator

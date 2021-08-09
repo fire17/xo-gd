@@ -1,13 +1,13 @@
-XObject + GlobalData
+xo-gd
 ===============================
 
-version number: 3.1.3
+version number: 3.1.4.01
 author: Tami Bar
 
 Overview
 --------
 
-Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Support You Fast Prototyping To Large Scale Systems
+Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Supports Fast Prototyping To Large Scale Systems
 
 Installation / Usage
 --------------------

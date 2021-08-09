@@ -7,13 +7,13 @@
 
 import time, random, sys, os, traceback
 
-from xoHelper import *
+from .xoHelper import *
 
 withGitSync = False
 if withGitSync:
-	from sync import *
+	from .sync import *
 else:
-    from xo import *
+    from .xo import *
 
 # print("subing")
 # xo.subscribe("settings.autoSync",lambda a: print(" ::: autoSync is True ::: ", xo.watcher.syncRepos(asyn = True), xo.watcher.run.setValue(True)) if a == True else False, autoPub="settings.autoRun")

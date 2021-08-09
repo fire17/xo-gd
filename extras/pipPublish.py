@@ -9,6 +9,12 @@
     a. open an account over on PyPi: https://pypi.org/account/register/
     b. open an account over on TestPyPi: https://test.pypi.org/account/register/
     c. open a repo
+    d. have correct ~.pypirc file
+    python setup.py sdist upload
+
+    twine upload -r pypitest dist/*
+    Upload to PyPI:
+    twine upload dist/*
 
     ######################
         THEN DO IT ALL ON GITHUB, new release, publish
@@ -29,7 +35,7 @@ git add -A
 git commit -m 'Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Supports Fast Prototyping To Large Scale Systems'
 git remote add origin https://github.com:fire17/xo-gd.git
 git push -u origin master
-git tag 3.1.3.02 -m 'GlobalData and XObject - Version 3 - Starlight'
+git tag 3.1.5.02 -m 'GlobalData and XObject - Version 3 - Starlight'
 git push --tags origin master
 5.
     cd ~
@@ -46,17 +52,15 @@ git push --tags origin master
 # COPY THIS:
 '''
 [distutils] # this tells distutils what package indexes you can push to
-index-servers =
-pypi
-pypitest
+index-servers = pypitest
 [pypi]
-repository: https://pypi.python.org/pypi
-username: {{your_username}}
-password: {{your_password}}
+repository: https://upload.pypi.org/legacy/
+username: xxx
+password: xxx
 [pypitest]
-repository: https://testpypi.python.org/pypi
-username: {{your_username}}
-password: {{your_password}}
+repository: https://test.pypi.org/legacy/
+username: xxx
+password: xxx
 '''
 
 '''
