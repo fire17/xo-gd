@@ -551,7 +551,7 @@ class Expando(SelfNamed):
 
 
 
-	def show(self,t = "    ",count = 0):
+	def show(self,t = "    ",count = 0, inLoop = False):
 		#### print("ssssssssssssssss..............")
 		s = ""
 		#### print("///////////",self._val,type(self._val))
@@ -570,7 +570,7 @@ class Expando(SelfNamed):
 			if not a.startswith("_"):
 				if "xo.obj" in str(type(self.__dict__[a])):
 					self.__dict__[a].show(count= count+1)
-		if count is 0:
+		if count is 0 and inLoop:
 			print("\n\nPress Ctrl+C to stop whileShow()\n")
 
 	def showMag(self,t = "    ",count = 0):
@@ -1016,22 +1016,22 @@ class obj(Expando):
 				# self._parent.__dict__[self._name] = None
 				self._parent.__dict__.pop(self._name)
 
-	def Show(self):
+	def Show(self, inLoop = False):
 		pass #print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS..............")
-		super().show()
+		super().show(inLoop = inLoop)
 	def ShowMag(self):
 		pass #print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS..............")
 		super().showMag()
 
 	def whileShow(self):
 		while(True):
-			self.show()
+			self.show(inLoop = True)
 			time.sleep(0.2)
 			os.system("clear")
 
 	def whileShowMag(self):
 		while(True):
-			self.showMag()
+			self.showMag(inLoop = True)
 			time.sleep(0.2)
 			os.system("clear")
 
@@ -1119,17 +1119,26 @@ class ok(object):
 		#### global hasManager, Dir, ExtKey, ExtData, channels
 		# print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
 		global manager
-		ok._shared = self
 		# self._max = 10000000,
 		# self._wait=wait
-		print("")
-		self._manager_ = manager
 		self._Threads_ = []
 		# self._showLoading = True
 		# self._shared._Threads_ = []
 		# self._Threads_ = []
 
 		# print("_______________iiiiiiiiiiiii______________")
+		if ok._shared is not None:
+			print(" ::::::::::::::::::::::::::::::::::::::::")
+			print(" :::                                  :::")
+			print(" :::        xObject is ready          :::")
+			print(" :::                                  :::")
+			print(" :::   now you can use xo. anywhere   :::")
+			print(" :::             :)                   :::")
+			print(" :::                                  :::")
+			print(" ::::::::::::::::::::::::::::::::::::::::")
+			print()
+		self._manager_ = manager
+		ok._shared = self
 
 		#### if hasManager:
 		#### 	# print("FFFFFFFFFFFFFFFFFF")
@@ -1286,7 +1295,7 @@ class ok(object):
 
 				pass
 			else:
-				print("File or folder does not exist",path, "doesn't exist")
+				print(" ::: File or folder does not exist",path, "doesn't exist")
 				return False
 
 
@@ -1408,7 +1417,7 @@ class ok(object):
 
 	def __get__(self,key, done = False, *args, **kwargs):
 		# print("TTTTTT",type(key))
-		print("###########",key,"#")
+		# print("###########",key,"#")
 		if done:
 			return self
 		for a in args:
@@ -1420,7 +1429,7 @@ class ok(object):
 		# for a in kwargs:
 		# 	print(a, kwargs[a])
 		# pass
-		print("eeeeeeeeeeeeeeeeeeeeeagggggggggaa")
+		# print("eeeeeeeeeeeeeeeeeeeeeagggggggggaa")
 		return [""]
 		return self.__dict__[key]
 
@@ -1589,10 +1598,7 @@ def cleantxt(a):
 # print("XXXXXXXXXXXXXx")
 
 def changeHome(newHome):
-	print("NEED TO IMPLEMENT HOME CHANGE")
-	print("NEED TO IMPLEMENT HOME CHANGE")
-	print("NEED TO IMPLEMENT HOME CHANGE")
-	print("NEED TO IMPLEMENT HOME CHANGE", newHome)
+	print(" ::: NEED TO IMPLEMENT HOME CHANGE ::: ", newHome)
 
 
 dbDirName = "xo-gd"
@@ -1630,8 +1636,12 @@ loadAll = True
 if loadAll:
 	xoManager.refreshChannels()
 
-
-xo = ok()        # xo can now can generate xobjects
+if ok._shared is None:
+	# print("FFFFFFFFFFFFFFFFFFFFFf")
+	xo = ok()        # xo can now can generate xobjects
+else:
+	# print("TTTTTTTTTTTTTTTTTTTTTTTT")
+	xo = ok._shared
 # xxo = ok()        # xo can now can generate xobjects
 # xxo.main = True
 # xo = xxo.main

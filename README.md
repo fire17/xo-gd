@@ -1,7 +1,7 @@
 xo-gd
 ===============================
 
-version number: 3.1.5.3
+version number: 3.1.5.4
 author: Tami Bar
 
 Overview
@@ -16,11 +16,18 @@ To install use pip:
 
     $ pip install xo-gd
 
-
 Or clone the repo:
 
     $ git clone https://github.com/fire17/xo-gd.git
     $ python setup.py install
+
+
+To Use xObject:
+In python run:
+    $ from xo import *
+or:
+    $ import xo ; xo = xo.ok()
+
 
 Contributing
 ------------
