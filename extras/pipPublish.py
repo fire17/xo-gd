@@ -9,19 +9,35 @@
     a. open an account over on PyPi: https://pypi.org/account/register/
     b. open an account over on TestPyPi: https://test.pypi.org/account/register/
     c. open a repo
+
+
     d. have correct ~.pypirc file
+'''
 
+# COPY THIS:
+'''
+#####################################################################
+''' '''
+[distutils] # this tells distutils what package indexes you can push to
+index-servers = pypitest
+[pypi]
+repository: https://upload.pypi.org/legacy/
+username: xxx
+password: xxx
+[pypitest]
+repository: https://test.pypi.org/legacy/
+username: xxx
+password: xxx
+''' '''
+############################################################
+''' '''
 
+######################################################
     python setup.py sdist
     twine upload -r pypitest dist/*
     twine upload dist/*
+######################################################
 
-    Upload to PyPI:
-
-    ######################
-        THEN DO IT ALL ON GITHUB, new release, publish
-    ######################
-    ######################
 1.
     cd to the folder that hosts the project
 2.
@@ -49,23 +65,7 @@ git push --tags origin master
     cd -
     python setup.py register -r pypitest
     python setup.py sdist upload -r pypitest
-'''
 
-# COPY THIS:
-'''
-[distutils] # this tells distutils what package indexes you can push to
-index-servers = pypitest
-[pypi]
-repository: https://upload.pypi.org/legacy/
-username: xxx
-password: xxx
-[pypitest]
-repository: https://test.pypi.org/legacy/
-username: xxx
-password: xxx
-'''
-
-'''
 xo versions
 1 - wish - channels, triggers, multiprocessing
 2 - rubicon - expando, selfNamed
