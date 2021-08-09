@@ -14,12 +14,12 @@ Installation / Usage
 
 To install use pip:
 
-    $ pip install xo
+    $ pip install xo-gd
 
 
 Or clone the repo:
 
-    $ git clone https://github.com/fire17/xo.git
+    $ git clone https://github.com/fire17/xo-gd.git
     $ python setup.py install
     
 Contributing
