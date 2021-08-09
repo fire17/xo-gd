@@ -11,8 +11,8 @@ import os.path as PATH
 import os
 import re
 
-import fileWatch as fW
-print(" ::: imported xo successfully ")
+from .fileWatch import *
+print(" ::: imported xo sufWccessfully ")
 
 
 class SelfNamed(object):
@@ -1280,7 +1280,8 @@ class ok(object):
 				# p = "/home/magic/AlphaENG/xo-gd/";
 				# xo.subscribe(p, lambda a : print(" ::: File/Folder Changed :",a), "res")
 				if True:
-					fW.watchF(path = path, callback = func, xoKey = autoPub, xo = self)
+					# fW.watchF(path = path, callback = func, xoKey = autoPub, xo = self)
+					watchF(path = path, callback = func, xoKey = autoPub, xo = self)
 				return True
 
 				pass
