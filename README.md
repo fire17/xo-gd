@@ -1,7 +1,7 @@
 xo-gd
 ===============================
 
-version number: 3.1.5.2
+version number: 3.1.5.3
 author: Tami Bar
 
 Overview
