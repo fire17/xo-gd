@@ -1,0 +1,4 @@
+psutil==5.4.2
+traceback
+dill
+GitPython
