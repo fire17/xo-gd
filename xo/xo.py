@@ -18,7 +18,7 @@ from .fileWatch import *
 class SelfNamed(object):
 	"""docstring for SelfNamed."""
 	__id = "xxx"
-	languageDefaults = ["value","_val","getattr","show","_id","__dict__"]
+	_languageDefaults = ["value","_val","getattr","show","_id","__dict__"]
 	def __init__(self, id = None):
 		super().__init__()
 		pass #print("|||||||||||||||||||||||||||||||||||||||||||||||||||")
@@ -89,7 +89,7 @@ class Expando(SelfNamed):
 
 	def tree(self):
 		for a in self.__dict__:
-			if not a.startswith("_") and a not in SelfNamed.languageDefaults:
+			if not a.startswith("_") and a not in SelfNamed._languageDefaults:
 				yield self[a]
 				if self[a] != None:
 					for z in self[a].tree():
@@ -119,7 +119,7 @@ class Expando(SelfNamed):
 	def kids(self):
 
 				for a in self.__dict__:
-					if not a.startswith("_") and a not in SelfNamed.languageDefaults:
+					if not a.startswith("_") and a not in SelfNamed._languageDefaults:
 						yield self[a]
 
 
@@ -128,7 +128,7 @@ class Expando(SelfNamed):
 		# childs = []
 		childs = {}
 		for a in self.__dict__:
-			if not a.startswith("_") and a not in SelfNamed.languageDefaults:
+			if not a.startswith("_") and a not in SelfNamed._languageDefaults:
 				# childs.append(self[a])
 				childs[a]=self[a]
 		return childs
@@ -197,7 +197,7 @@ class Expando(SelfNamed):
 		pass ## print("EEEEEEEEEEEEEEEEEEEE1")
 		if "str" not in str(type(name)):
 			name = str(name)
-		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed.languageDefaults:#### and "__skip" in self.__dict__ and name not in self.skip:
+		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed._languageDefaults:#### and "__skip" in self.__dict__ and name not in self.skip:
 			if "xo.obj" not in str(type(value)):
 				pass ## print("_____________________",str(type(value)))
 				if name not in self.__dict__:
@@ -228,7 +228,7 @@ class Expando(SelfNamed):
 			# return atr[0]
 			return atr
 
-		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed.languageDefaults and name not in self.__dict__:
+		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed._languageDefaults and name not in self.__dict__:
 			# print("ppp44444")
 			self.__dict__[name] = obj(id = self._id+"/"+name, parent = self)
 
@@ -251,7 +251,7 @@ class Expando(SelfNamed):
 		pass #print("iiiiiiiiiiiiiiiiioooooooo")
 		if "str" not in str(type(name)):
 			name = str(name)
-		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed.languageDefaults:#### and "__skip" in self.__dict__ and name not in self.skip:
+		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed._languageDefaults:#### and "__skip" in self.__dict__ and name not in self.skip:
 			pass #print("VVVVVVVV",str(type(value)))
 			if "xo.obj" not in str(type(value)):
 				pass #print("_____________________",str(type(value)))
@@ -290,7 +290,7 @@ class Expando(SelfNamed):
 		if "str" not in str(type(name)):
 			name = str(name)
 		#### return name
-		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed.languageDefaults and name not in self.__dict__:
+		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed._languageDefaults and name not in self.__dict__:
 			pass #print("OOOOO_ooooooooooooooooooooo",name)####,self.__dict__)
 			pass #print("aaaaaaaaaaaaaa")
 			# print("ppp66666",self)
@@ -385,10 +385,23 @@ class Expando(SelfNamed):
 		#### print("!!!!!!!!!")
 		#### print(type(other))
 		#### print()
+		if other is None and (self._val is None or self._val[0] is None):
+			return None
 		if self.__isObj(other):
 			return self._val[0] + other._val[0]
 		elif "str" in str(type(other)):
 			return str(self._val[0]) + other
+		if self._val[0] is None:
+			if "list" in str(type(other)):
+				return 	other
+			return []
+		if other is None:
+			other = []
+			return 	self._val + other
+		if "list" in str(type(other)):
+			if "list" in str(type(self._val[0])):
+				return self._val[0] + other
+			return 	self._val + other
 		return self._val[0] + other
 
 	def __radd__(self,other):
@@ -498,7 +511,7 @@ class Expando(SelfNamed):
 				# print(xo.GetXO(owner)+key, v,retXO=True)
 			for a in appendToLearn:
 				if self._parent is not None:
-					self._parent.learned.value(ref=True).append(a)
+					self._parent.learned+=[a]
 				else:
 					print(" ::: WTF")
 					self.value(ref=True).append(a)
@@ -1446,7 +1459,7 @@ class ok(object):
 
 
 
-		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed.languageDefaults:#### and "__skip" in self.__dict__ and name not in self.skip:
+		if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed._languageDefaults:#### and "__skip" in self.__dict__ and name not in self.skip:
 			if "xo.obj" not in str(type(value)):
 				pass ## print("_____________________",str(type(value)))
 				if name not in self.__dict__:
@@ -1474,7 +1487,7 @@ class ok(object):
 
 		return self._returnFull_(id=name)
 
-		# if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed.languageDefaults and name not in self.__dict__:
+		# if not name.startswith("_") and "_val" in self.__dict__ and name not in SelfNamed._languageDefaults and name not in self.__dict__:
 		# 	self.__dict__[name] = obj(id = self._id+"/"+name, parent = self)
 		#
 		# if name in self.__dict__:
@@ -1598,7 +1611,8 @@ def cleantxt(a):
 # print("XXXXXXXXXXXXXx")
 
 def changeHome(newHome):
-	print(" ::: NEED TO IMPLEMENT HOME CHANGE ::: ", newHome)
+	pass
+	# print(" ::: NEED TO IMPLEMENT HOME CHANGE ::: ", newHome)
 
 
 dbDirName = "xo-gd"
