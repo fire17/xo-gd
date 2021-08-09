@@ -2,10 +2,18 @@
 # Clean Structure for Pip Publish
 
 '''
+
+
+
 0 : Preperations:
     a. open an account over on PyPi: https://pypi.org/account/register/
     b. open an account over on TestPyPi: https://test.pypi.org/account/register/
     c. open a repo
+
+    ######################
+        THEN DO IT ALL ON GITHUB, new release, publish
+    ######################
+    ######################
 1.
     cd to the folder that hosts the project
 2.
@@ -18,7 +26,7 @@
 
 git init
 git add -A
-git commit -m 'Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Support You Fast Prototyping To Large Scale Systems'
+git commit -m 'Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Supports Fast Prototyping To Large Scale Systems'
 git remote add origin https://github.com:fire17/xo-gd.git
 git push -u origin master
 git tag 3.1.3 -m 'GlobalData and XObject - Version 3 - Starlight'

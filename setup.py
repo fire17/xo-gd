@@ -18,13 +18,13 @@ install_requires = [x.strip() for x in all_reqs if 'git+' not in x]
 dependency_links = [x.strip().replace('git+', '') for x in all_reqs if x.startswith('git+')]
 
 setup(
-    name='xo',
+    name='XObject + GlobalData',
     version=__version__,
     description='Use Python Like You Never Have Before, Easy Acces To: Events and Triggers, Realtime MultiProcessing, Instant Dynamic DB, Filesytem & Web Watchdog, Sockets, API Server, Support You Fast Prototyping To Large Scale Systems',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/fire17/xo',
-    download_url='https://github.com/fire17/xo/tarball/' + __version__,
+    url='https://github.com/fire17/xo-gd',
+    download_url='https://github.com/fire17/xo-gd/tarball/' + __version__,
     license='BSD',
     classifiers=[
       'Development Status :: 3 - Alpha',
