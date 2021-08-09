@@ -3,9 +3,14 @@
 
 # from xo import *
 print()
-print(" ::: imported xo successfully ")
+print(" ::: Please use ")
+print(" :::    from xo import *")
+print(" ::: or        ")
+print(" :::    import xo; xo = ok()")
+print()
+
 from .gd import *
-xo = xo.ok()
+# xo = xo.ok()
 
 
 # meet xo. your new friend

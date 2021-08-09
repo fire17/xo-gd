@@ -108,13 +108,42 @@ xo.f._repoSize = lambda a = "https://github.com/fire17/Projects":print(a,"Size i
 print(" ::: Init Done ")
 
 print()
-print(" :::        xObject is ready         :::")
-print(" :::  now you can use xo. anywhere   :::")
-print()
 if xo._firstTime():
-	print(" ::: Welcome to xObject  ")
-	print(" ::: run xo.helper() to see new features and possible commands")
-	print()
+	print(" ::::::::::::::::::::::::::::::::::::::::")
+	print(" :::                                  :::")
+	print(" :::        xObject is ready          :::")
+	print(" :::                                  :::")
+	print(" :::      Make sure you used          :::")
+	print(" :::                                  :::")
+	print(" :::       from xo import *           :::")
+	print(" :::  or                              :::")
+	print(" :::     import xo ; xo = xo.ok ()    :::")
+	print(" :::   now you can use xo. anywhere   :::")
+	print(" :::             :)                   :::")
+	print(" :::                                  :::")
+	print(" ::::::::::::::::::::::::::::::::::::::::")
+else:
+	print(" ::::::::::::::::::::::::::::::::::::::::")
+	print(" :::                                  :::")
+	print(" :::        xObject is ready          :::")
+	print(" :::                                  :::")
+	print(" :::   now you can use xo. anywhere   :::")
+	print(" :::             :)                   :::")
+	print(" :::                                  :::")
+	print(" ::::::::::::::::::::::::::::::::::::::::")
+print()
+
+
+
+# print(" ::: Welcome to xObject  ")
+# print(" ::: run xo.helper() to see new features and possible commands")
+# print()
+# print(" ::: Please use                    	:::")
+# print(" :::    from xo import *             :::")
+# print(" ::: or                           	:::")
+# print(" :::    import xo; xo = ok()"        :::")
+# print(" :::    xo = ok()                    :::")
+# print()
 
 
 # xo.test = testAsyn
