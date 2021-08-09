@@ -1,7 +1,12 @@
+### XObject + GlobalData - Version 3.1.5.6 - Startlight✨
+# _xObject + Global Data_ <br>Use Python Like You Never Have Before ! <br>
+### _Easy Acces To:_
+## 🔔 Events and Triggers <br> 💛 Realtime MultiProcessing <br> 🏃 Instant Dynamic DB <br> 📁 Filesytem & Web Watchdog <br> 🌐 Sockets, API Server <br> ⚡ Supports Fast Prototyping To Large Scale Systems <br><br>
+
 xo-gd
 ===============================
 
-version number: 3.1.5.5
+version number: 3.1.5.6
 author: Tami Bar
 
 Overview
