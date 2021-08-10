@@ -42,6 +42,12 @@ password: xxx
     twine upload -r pypitest dist/*
     twine upload dist/*
 ######################################################
+git add .
+git commit -m 'first commit'
+git push
+git tag {{version}} -m 'adds the version you entered in cookiecutter as the first tag for release'
+git push --tags origin master
+######################################################
 
 1.
     cd to the folder that hosts the project

@@ -8,4 +8,3 @@ dill
 GitPython
 paho-mqtt
 pickle
-xo-gd==3.2.1
