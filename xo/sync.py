@@ -412,6 +412,7 @@ def chat(channel = None):
         cn = channel
     channel = cn
     if channel not in xo.mqtt[str(xo.pid())].subscribedTo.value():
+        # print("............")
         sub(channel)
     time.sleep(1)
 
