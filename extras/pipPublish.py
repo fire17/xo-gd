@@ -37,6 +37,15 @@ password: xxx
 ############################################################
 ''' '''
 
+
+#########################################
+Commit
+python setup.py sdist
+Commit
+git tag 3.2.3 -m 'pip install xo-gd -U'
+git push
+git push --tags
+twine upload -r pypitest dist/* && twine upload dist/*
 ######################################################
     python setup.py sdist
     twine upload -r pypitest dist/*
