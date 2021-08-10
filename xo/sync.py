@@ -34,6 +34,7 @@ def on_connect(client, userdata, flags, rc):
 # xo.mqtt.mainKey = "U(Y&Y*GN&(B6t097mTN(&^NT&(*))))"
 # def sub(mqttChannel = None, func = lambda *args,**kw :xo.pnr([' ::: xo.mqtt INCOMMING !!! ',args,kw]), autoPub = "mqtt"):
 def sub(mqttChannel = None, func = None, autoPub = "mqtt"):
+    # print(mqttChannel, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     if func is None:
         func = lambda a, *aa, **aaa : [a,aa,aaa]
 
@@ -48,6 +49,8 @@ def sub(mqttChannel = None, func = None, autoPub = "mqtt"):
         if mqttChannel is None:
             print(" ::: Please set MQTT Main Key with xo.mqtt.mainKey = \"YourSecretChannel\"")
             return False
+
+        xo.mqtt[str(xo.pid())].subscribedTo += mqttChannel
         xo.mqtt.settings.newSub = mqttChannel
         # print()
         xo.mqtt.settings[mqttChannel] = autoPub
@@ -403,15 +406,51 @@ def run(data):
 
 xo.f.run = run
 
-def chat():
-    print()
-    print(f" ::: Entering chat \"{xo.mqtt.mainKey.value()}\"","\n ::: Type your message and press enter to send\n ::: exit() or Ctrl+C to leave\n")
-    stop = False
+def chat(channel = None):
+    cn = xo.mqtt.mainKey.value()
+    if not (channel is None or channel == ""):
+        cn = channel
+    channel = cn
+    if channel not in xo.mqtt[str(xo.pid())].subscribedTo.value():
+        sub(channel)
+    time.sleep(1)
+
     username = str(os.getpid())
     if xo.mqtt.username.value() is not None:
         username = xo.mqtt.username.value()
+    print()
+    print(f" ::::::::::::::::::::::::::::::::::::::::::::::::::: ")
+    print(f" ::: Starting xo Chat \"{channel}\"                     ")
+    print(f" :::                          ")
+    print(f" ::: Your username is {username} , to change it use: ")
+    print(f" ::: username = myUsername                           ")
+    print(f" :::                          ")
+    print(f" ::: To to change channel, use: ")
+    print(f" ::: channel = channelToChatIn                       ")
+    print(f" :::                          ")
+    print(f" ::: exit() or Ctrl+C to leave chat                  ")
+    print(f" ::::::::::::::::::::::::::::::::::::::::::::::::::: ")
+    stop = False
+    channelChanged = False
     while(not stop):
         try:
+            if channel not in xo.mqtt[str(xo.pid())].subscribedTo.value():
+                print("CCCCCCCCCC",channel)
+                print("CCCCCCCCCC",xo.mqtt[str(xo.pid())].subscribedTo.value())
+                sub(channel)
+                if not (channel not in xo.mqtt[str(xo.pid())].subscribedTo.value()):
+                    time.sleep(1)
+                    print(f"      You are connected to \"{channel}\"             ")
+                    print(f"      Type your message and press enter to send      ")
+                    print("")
+                    channelChanged = False
+
+            elif channelChanged:
+                channelChanged = False
+                time.sleep(1)
+                print(f"      You are connected to \"{channel}\"             ")
+                print(f"      Type your message and press enter to send      ")
+                print("")
 
             # print("                                                          \n                                                            "
             # +"\n ("+username+"): ",end='')
@@ -419,19 +458,79 @@ def chat():
             +"\n ("+username+"): ",end='')
             res = input()
             print(chr(27)+"[1A"+"\033[F"+f" ::: {username} : {res}")
-            if res is "exit" or res is "exit()":
+            cmd = False
+            if res is ":":
+                cmd = True
+            if res.strip().strip(":") is "exit" or "exit()" in res:
+                print(f"      Exiting \"{channel}\"             ")
+                print()
                 stop = True
-            else:
-                xo.msg(res, chat = True, prev = chr(27)+"[2A\n"+"",after = chr(27)+"[1A\n\n")
-                # xo.msg(res, chat = True, prev = chr(27)+"[2A\033[F"+"\033[F"+"\033[F\n\n\n")
-                # xo.msg(res, chat = True, prev = "")
+                cmd = True
+            if "=" in res and "user" in res.split("=")[0]:
+                newUsername = res.split("=")[1].strip().split(" ")[0].strip()
+                # print(f" ::: nu is {newUsername} ! :::")
+                if len(newUsername) > 0:
+                    print(f" ::: Username changed to {newUsername} ! :::")
+                    xo.mqtt.username = newUsername
+                    username = newUsername
+                # print(f" ::: Username changed to {newUsername} ! :::")
+                pass #run commands
+                cmd = True
+            if "=" in res and "channel" in res.split("=")[0]:
+                newChannel = res.split("=")[1].strip().split(" ")[0].strip()
+                # print(f" ::: nu is {newUsername} ! :::")
+                if len(newChannel) > 0:
+                    print(f" ::: Changing to {newChannel} ! :::")
+                    # xo.mqtt.username = newChannel
+                    channel = newChannel
+                    channelChanged = True
+                # print(f" ::: Username changed to {newUsername} ! :::")
+                pass #run commands
+                cmd = True
+            if not cmd:
+                if res is "exit" or res is "exit()":
+                    stop = True
+                else:
+                    xo.msg(res, chat = True, channel = channel, prev = chr(27)+"[2A\n"+"",after = chr(27)+"[1A\n\n")
+                    # xo.msg(res, chat = True, prev = chr(27)+"[2A\033[F"+"\033[F"+"\033[F\n\n\n")
+                    # xo.msg(res, chat = True, prev = "")
         except:
             traceback.print_exc()
             stop = True
 xo.chat = chat
 
-def ping(msg = "hello from the other side", data = None, *ar, **kw):
-    xo.pub(ping = True, run = lambda *a,**aa:xo.pub("hello from the other side"))
+def whilePing(msg = "hello from the other side", channel = None, silent = False, t = 1, tt = [10,3], data = None, *ar, **kw):
+    cn = xo.mqtt.mainKey.value()
+    if not (channel is None or channel == ""):
+        cn = channel
+    print(f" ::: Pinging everybody on \"{cn}\" channel... ::: {str(tt[1])} times every {str(tt[0])} seconds ::: Press Ctrl+C to stop ")
+    try:
+
+        while(True):
+            for a in range(tt[1]):
+                xo.ping(msg = msg, channel = channel, silent = silent, t = t, tt = tt,  data = data, *ar, **kw)
+                time.sleep(t)
+            time.sleep(tt[0])
+    except:
+        if not silent or xo.settings.debug.value() == True:
+            print()
+            print(" ::: Exception while pinging ")
+            traceback.print_exc()
+            print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+            print()
+        print("///////////////")
+    print("///////////////")
+
+def ping(msg = "hello from the other side", channel = None, silent = False, data = None, *ar, **kw):
+    if channel is None or channel == "":
+        xo.pub(ping = True, silent = True, run = lambda *a,**aa:xo.pub("hello from the other side"))
+    else:
+        xo.pub(ping = True, mqttChannel = channel, silent = True, run = lambda *a,**aa:xo.pub("hello from the other side"))
+    if not silent or xo.settings.debug == True:
+        cn = xo.mqtt.mainKey.value()
+        if not (channel is None or channel == ""):
+            cn = channel
+        print(f" ::: Pinging channel \"{cn}\"... ")
 
 xo.ping = ping
 
@@ -440,7 +539,11 @@ def _remoteCMD(cmd, *ar, **kw):
 
 xo._remoteCMD = _remoteCMD
 
-def msg(msg = "", title = None, *ar, **kw):
+def msg(msg = "", title = None, channel = None, *ar, **kw):
+    cn = xo.mqtt.mainKey.value()
+    if not (channel is None or channel == ""):
+        cn = channel
+    channel = cn
     username = str(os.getpid())
     if xo.mqtt.username.value() is not None:
         username = xo.mqtt.username.value()
@@ -453,9 +556,11 @@ def msg(msg = "", title = None, *ar, **kw):
         if "after" in kw:
             after = kw["after"]
             # print("pppppppppppppppppppp")
-    xo.pub(data = title, run = lambda *a,**aa:xo.pnr(prev+f" ::: {username}: "+msg+after), silent = True)
+    xo.pub(data = title, run = lambda *a,**aa:xo.pnr(prev+f" ::: {username}: "+msg+after), silent = True, mqttChannel = channel)
 
 xo.msg = msg
+
+xo.whilePing = whilePing
 # print("BBBBBBBBBb")
 
 if xo.settings.auto == True:

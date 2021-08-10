@@ -377,6 +377,8 @@ class Expando(SelfNamed):
 
 	#### by value of main
 	def __eq__(self, other):
+		if "bool" in str(type(other)) and ("bool" in str(type(self._val)) or (self._val is not None and ("dict" in str(type(self._val[0])) or "dict" in str(type(self._val[0])) )and len(self._val) > 0 and "bool" in str(type(self._val[0])))):
+			return self._val[0] == other
 		if self.__isObj(other):
 			return self._val[0] == other._val[0]
 		elif "str" in str(type(other)):
