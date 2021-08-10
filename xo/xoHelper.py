@@ -162,7 +162,7 @@ def testAsyn():
 	print("1111")
 
 def asyn(func, *args, **kwargs):
-	print(args,kwargs)
+	# print(args,kwargs)
 	xo["_f"][str(func)] = func
 	xo["_f"][str(func)](*args, **kwargs,asyn = True)
 

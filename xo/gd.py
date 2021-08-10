@@ -105,6 +105,21 @@ xo.f.takes3 = takes3sec
 xo.f.takesX = takesXsecs
 xo.f._repoSize = lambda a = "https://github.com/fire17/Projects":print(a,"Size is",xo.cmd(f"curl {a} 2> /dev/null | grep size | tr -dc '[:digit:]'",asyn = False),"MBs")
 
+from .sync import *
+# from .sync import MQTT as mq
+# print("ccccc",sub)
+xo.settings = "Here we save Settings"
+xo.mqtt.settings.server = "broker.hivemq.com"
+xo.mqtt.settings.port = 1883
+xo.mqtt.settings.keepAlive = 60
+# xo.mqtt.mainKey = "U(Y&Y*GN&(B6t097mTN(&^NT&(*))))"
+sub()
+
+xo.subscribe("mqtt.mainKey", sub)
+
+xo.sub = sub
+xo.pub = pub
+# print("ccccc")
 print(" ::: Init Done ")
 
 print()

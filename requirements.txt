@@ -6,3 +6,5 @@ coverage
 pypi-publisher
 dill
 GitPython
+paho-mqtt
+pickle

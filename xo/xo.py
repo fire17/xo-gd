@@ -97,7 +97,7 @@ class Expando(SelfNamed):
 
 	def subscribe(self, func = None, autoPub = None, block = False, once= False, echo=True, debug = False, withID = False):
 		if func is None:
-			func = lambda a : print("xObject changed:",a)
+			func = lambda a, *aa, **aaa : [a,aa,aaa]
 			withID = True
 		channel = self._id.replace(".","/")
 		# print("CCCCCCCCCCCCCCCCCC",channel)
@@ -323,8 +323,14 @@ class Expando(SelfNamed):
 		#### self._val *= 3
 
 	def __repr__(self):
+		justShow = True
+		if justShow:
+			self.show(ret = False)
+			print()
 		# print("where are we ?")
 		recursiveDict = False
+		if self._val is None:
+			self._val = [[]]
 		ret = "{xobject "+str({str(self._name):self._val[0]})[1:-1]+f" ::: children({len(self.children())})"
 		childs = []
 		if self.children() is not None and len(self.children()) > 0:
@@ -385,6 +391,19 @@ class Expando(SelfNamed):
 		#### print("!!!!!!!!!")
 		#### print(type(other))
 		#### print()
+
+		#list append overrull
+		if self._val == None:
+			self._val = [[]]
+		if len(self._val) == 0:
+			self._val[0].append(other)
+			return self._val[0]
+		if str(type(other)) != str(type(self._val[0])):
+			if "list" not in str(type(other)):
+				other = [other]
+			if "list" not in str(type(self._val[0])):
+				self._val[0] = [self._val[0]]
+
 		if other is None and (self._val is None or self._val[0] is None):
 			return None
 		if self.__isObj(other):
@@ -564,7 +583,42 @@ class Expando(SelfNamed):
 
 
 
-	def show(self,t = "    ",count = 0, inLoop = False):
+	def show(self,t = "    ",count = 0, inLoop = False, ret = False):
+		#### print("ssssssssssssssss..............")
+		s = ""
+		#### print("///////////",self._val,type(self._val))
+
+		if "str" in str(type(self._val)):
+			s = "\'"
+		p = self._id.split("/")[-1] +" = "+ s+str(self._val)+s
+		tab = ""
+		for i in range(count):
+			tab+=t
+
+		retList = []
+		res = []
+		p = tab+p
+		if ret:
+			retList.append(p)
+		else:
+			print(p.replace("\t","    "))
+		for a in self.__dict__:
+			# if "_" not in a:
+			if not a.startswith("_"):
+				if "xo.obj" in str(type(self.__dict__[a])):
+					if ret:
+						res = self.__dict__[a].show(count= count+1, ret = ret)
+					else:
+						self.__dict__[a].show(count= count+1, ret = ret)
+		if count is 0 and inLoop:
+			print("\n\nPress Ctrl+C to stop whileShow()\n")
+
+		if ret:
+			if count == 0:
+				return str(retList + res)
+			return retList +["\n"]+ res
+
+	def show0(self,t = "    ",count = 0, inLoop = False):
 		#### print("ssssssssssssssss..............")
 		s = ""
 		#### print("///////////",self._val,type(self._val))
@@ -684,6 +738,7 @@ class __objManager(object):
 		#### self = data[0]
 		while True:
 
+			# print("FFFFFFF")
 			chKeys = channels.keys()
 			cKeys = []
 			discovery = False
@@ -698,12 +753,16 @@ class __objManager(object):
 						self._fin = False
 						discovery = True
 						if channels[channel]["ref"] is not None and len(channels[channel]["ref"])>1:
-							pass #print("DUPPPPPPPPPPPPPPPPPPPPPPPPPPPp")
+							# print("DUPPPPPPPPPPPPPPPPPPPPPPPPPPPp", channel)
+							pass
 						if channels[channel]["ref"] is not None and len(channels[channel]["ref"])>0:
+							# print("DUPPPPPPPPPPPPPPPPPPPPPPPPPPPpXxxx", channel)
 							channels[channel]["ref"][0][0][d] = obj(id=channel+"/"+d, parent = self.getXO(channel))
+							# print("0000000000000000000000000000000xxx")
 						else:
+							# print("DUPPPPPPPPPPPPPPPPPPPPPPPPPPPpZZZZ", channel)
 							pass #print("XRRXRXRXRXRXrXR")
-
+				# print("aaaaaaaaaaa")
 				keyC = self.loadKey(channel)
 				#### print("channel",channel)
 				try:
@@ -716,9 +775,13 @@ class __objManager(object):
 						pass
 				except:
 					pass #print("XXXXXXXX",channel)
+				# print("CCCCCCCCCCCCCCCCCCCC")
 
 			if not discovery:
 				self._fin = True
+			else:
+				pass
+				# print("DDDDDDDDDDDDDDDD")
 
 
 			time.sleep(wait)
@@ -784,8 +847,11 @@ class __objManager(object):
 			print("!!!!!!")
 			return self.zero(12)/self.zero(1)
 
+		# print("........")
 		data = self.getChannel(channel)
+		# print("........!!!!!!!")
 		self.setChannelRef(channel, ref = ref)
+		# print("........!!!!!!!!!!!!!!!!2")
 		#### if value is None:
 		#### 	value = [None]
 
@@ -797,10 +863,12 @@ class __objManager(object):
 		#### 	else:
 		#### 		self.save(channel, value)
 
+		# print("........!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
 		if value is not None:
 			#### value[0] = self.getValue(channel)
 			self.save(channel, value)
 
+		# print("........!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!0")
 		return data["_val"] #### BINDED! [var]
 
 
@@ -1014,13 +1082,16 @@ class obj(Expando):
 	def __init__(self, val = None, id = None, parent = None):
 		global manager
 		self.__id = id
+		# print("........")
 		super().__init__(val = val, id = id)
+		# print("........ddd")
 
 		self._manager = manager
 		self.__id = id
 		self._parent = parent
 		# print("!!!!!!!!", self.__id, "PPPPPPP",self._parent)
 		self._val = manager.bind(self.__id, val, ref = [self])
+		# print("........xxxxx")
 
 
 	def Del(self):
@@ -1095,7 +1166,8 @@ class ok(object):
 	def _returnFull_(self, id = None, val = None):
 		pass #print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 
-
+		timeOut = .1
+		t0 = time.time()
 		pass #print("00000000")
 		t = time.time()
 		pass #print("00000000")
@@ -1113,7 +1185,7 @@ class ok(object):
 			print()
 
 		try:
-			while(manager._fin is False):
+			while(manager._fin is False and time.time()-t0 < timeOut):
 			####
 			#### while(abs(manager._checkCounter- cycle[0])<2):
 				pass #print("waiting for ",id,"to fill",manager._checkCounter, cycle,manager._fin)
@@ -1121,7 +1193,7 @@ class ok(object):
 
 			pass #print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",manager._checkCounter,cycle)
 		except:
-			print(f" ::: Exception while looking for xoKey {id} or setting value {val}")
+			print(f" ::: Exception while looking for xoKey {id} value {val}")
 			traceback.print_exc()
 		# print("waiting full TIME =========",time.time()-t)
 		return full
@@ -1177,7 +1249,7 @@ class ok(object):
 	def GetXO(self, get = "", allow_creation = False, getValue = False, follow = None):
 		# print("XXXXXXXXXXXXXXXXXXXX", get, getValue)
 		if "str" not in str(type(get)):
-			print("Please provide a string as a key")
+			print(self._id,"Please provide a string as a key",get)
 			return None
 		c = 0
 		# print(c,c,c,c,c,c,c,c,c,c);c+=1
@@ -1228,6 +1300,14 @@ class ok(object):
 	## xo.wow.SetValue(1000,retXO=True).runFunc1(True, retXO=True).runFunc2("awesome") '''
 	def SetValue(self, key, value, allow_creation = True, retBool = True, retValue = False, retXO = False):
 
+		if "xo.obj" in str(type(key)):
+			if key.value() is not None:
+				key = str(key.value())
+			else:
+				key = key._id
+		if key is None:
+			" ::: SetValue Key is None :::"
+			return False
 		res = self.GetXO(key, allow_creation=allow_creation)
 		if res is not None and "xo.obj" in str(type(res)):
 			# res.show()

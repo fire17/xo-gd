@@ -1,329 +1,396 @@
-from gd import *
+from .gd import *
 import requests
 import git
 from git import Repo
 # import fileWatch
 from .xo import *
 
-from .osCommands import os_command
-from .osCommands import *
+import builtins as __builtin__
 
-from functools import reduce  # Required in Python 3
-import operator
-def prod(iterable):
-    return reduce(operator.mul, iterable, 1)
-#multiples = [prod(pair) for pair in zip(*[[1,2,3,4],[3,2,1,4],[5.67,1,.5,16]])]# ; multiples
-#sum = [sum(pair) for pair in zip(*[[1,2,3,4],[3,2,1,4],[5.67,1,.5,16]])]# ; multiples
-# x * [1,2,3]
+# xo.working = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYEP"
 
-# print("..........")
+'''
+# PUB PAHO IN REQS
+'''
+####### Client
+import paho.mqtt.client as mqtt
+import dill as pk # import pickle as pk
 
-from git import RemoteProgress
-from tqdm import tqdm
-#!/usr/bin/python
-# import time, os
-from datetime import datetime
-from datetime import timedelta
-# from gd import *
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+# MQTT_BROKER_HOST = 'mqtt.eclipse.org'
+# MQTT_BROKER_PORT = 1883
+# MQTT_KEEP_ALIVE_INTERVAL = 60
+# class MQTT(object):
+def on_connect(client, userdata, flags, rc):
+    # print()
+    print(" ::: MQTT Subscribing To",xo.mqtt.settings.newSub.value())
+    extra =  "(failed)"
+    if rc == 0:
+        extra =  "(success)"
+    print(" ::: MQTT Connected with result code " + str(rc),extra)
+    print()
+    client.subscribe(xo.mqtt.settings.newSub.value())
+    return rc == 0
 
+# xo.mqtt.mainKey = "U(Y&Y*GN&(B6t097mTN(&^NT&(*))))"
+# def sub(mqttChannel = None, func = lambda *args,**kw :xo.pnr([' ::: xo.mqtt INCOMMING !!! ',args,kw]), autoPub = "mqtt"):
+def sub(mqttChannel = None, func = None, autoPub = "mqtt"):
+    if func is None:
+        func = lambda a, *aa, **aaa : [a,aa,aaa]
 
-class MyHandler(FileSystemEventHandler):
-	def __init__(self, path, autoPub, delta = 1):
-		self.last_modified = datetime.now()
-		# self.interested = xo.mock.interested.value()
-		self.ignore = ["~"]
-		self.interested = []
-		self.path = path
-		self.autoPub = autoPub
-		self.delta = delta
+    server = xo.mqtt.settings.server.value()
+    port = xo.mqtt.settings.port.value()
+    keepAlive = xo.mqtt.settings.keepAlive.value()
+    try:
+        # print(xo.settings)
+        if mqttChannel is None:
+            mqttChannel = xo.mqtt.mainKey.value()
 
-	def on_modified(self, event):
-		interesting = False
-		skip = False
-		if len(self.interested) == 0:
-			interesting = True
-		for i in self.interested:
-			if i in str(event.src_path):
-				for s in self.ignore:
-					if s in str(event.src_path):
-						skip = False
-				if not skip:
-					interesting = True
+        if mqttChannel is None:
+            print(" ::: Please set MQTT Main Key with xo.mqtt.mainKey = \"YourSecretChannel\"")
+            return False
+        xo.mqtt.settings.newSub = mqttChannel
+        # print()
+        xo.mqtt.settings[mqttChannel] = autoPub
+        xo.subsc1ribe(autoPub,func)
+        client = mqtt.Client()
+        client.on_connect = on_connect
+        client.on_message = on_message
 
-		if interesting:
-			if datetime.now() - self.last_modified < timedelta(seconds=self.delta):
-				return
-			else:
-				self.last_modified = datetime.now()
-			# print("PPPPPPP",self.autoPub)
-			auto = xo.GetXO(self.autoPub)
-			auto["changes"] = event.key
+        client.connect(server,port,keepAlive)
+        # print("PPPPPPPPPPPPPPPPPPPPPPPP",server, port,keepAlive)
+        # client.on_message = lambda *args,**kw: func(*args, **kw)
+        client.loop_start()
+        # print()
+        # print(f" ::: Subsctibing To MQTT ::: {mqttChannel} ::: autoPub is {autoPub}")
+        # print()
+        # return True
+    except :
+        print()
+        print(" ::: Exception while subscribing to MQTT, are you connected to the internet ?")
+        print(f" ::: MQTT Server server = \"{server}\", port = {port} , keepAlive = {keepAlive}")
+        print(f" ::: Connection Failed ::: to enable exeption prints use xo.settings.debug = True")
+        if xo.settings.debug == True:
+            print()
+            traceback.print_exc()
+        print()
+        return None
+    return True
 
-			print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes","event.is_directory:",event.is_directory , event)
-			# print(f'Event type: {event.event_type}  path : {event.src_path}')
-			# print(event.is_directory) # This attribute is also available
-
-# xo.mock.interested = ["AEsales.xlsx"]
-# xo.mock.interested = [""]
-# xo.mock.interested.ignore = ["~"]
-
-
-def watchFiles(path, xoKey, callback):
-	# if not xoKey.endswith(".changes"):
-	# 	xoKey += ".changes"
-	event_handler = MyHandler(path, xoKey)
-	observer = Observer()
-	xoKey = (xoKey + ".changes").replace("/",".")
-	xo.GetXO(xoKey, allow_creation=True).subscribe(callback)
-
-	# cwd = os.getcwd()
-	print(" ::: Watching Files:",path, xoKey)
-	observer.schedule(event_handler, path=path, recursive=True)
-	observer.start()
-
-	try:
-		while (xo.watcher.run == True):
-			time.sleep(1)
-	except KeyboardInterrupt:
-		observer.stop()
-	observer.join()
+#pub(package("AAAX", cmdDict = {"subscribe":"newValue","run":lambda a, *qa,**b:print(f" III new value is{xo.later}"), "saveAt":"newValue"}, yo = "YO YO"))
+# xo.mqtt.skip.time = 1
+def pub(data = None, mqttChannel = None, autoPackage = True, *ar ,**kw):
+    if data is None:
+        du = 'PID ' + str(os.getpid())
+        if xo.mqtt.username.value() is not None:
+            du = xo.mqtt.username.value()
+        data =f" @@@ Hello World! from {du}"
+    msg = data
 
 
+    if "bytes" not in str(type(data)) and autoPackage:
+        data = package(data,*ar,**kw )
+    if mqttChannel is None:
+        mqttChannel = xo.mqtt.mainKey.value()
+    kw["mqttChannel"] = mqttChannel
+    print(f" ::: Sending Data ::: {str(msg[:30])} ... to Channel \"{mqttChannel}\" ::: len(data) = {len(data)}\n")
+    if xo.log.value() == True or True:
+        xo.log += f"Sending data to \"{mqttChannel}\""
+    client = mqtt.Client()
+    client.connect(xo.mqtt.settings.server.value(), xo.mqtt.settings.port.value(), xo.mqtt.settings.keepAlive.value())
+    # if mqttChannel in xo.mqtt.subscribed:
+    #     xo.mqtt.skip += mqttChannel
+    #     xo.mqtt.skip += mqttChannel
+    username = str(os.getpid())
+    if xo.mqtt.username.value() is not None:
+        username = xo.mqtt.username.value()
 
-class CloneProgress(RemoteProgress):
-	def __init__(self):
-		super().__init__()
-		self.pbar = tqdm()
+    client.publish(mqttChannel, pk.dumps([username,str(os.getpid()),data]));
+    client.loop_start()
+    # client.disconnect();
 
-	def update(self, op_code, cur_count, max_count=None, message=''):
-		self.pbar.total = max_count
-		self.pbar.n = cur_count
-		self.pbar.refresh()
+# def cool():
+#     print("COOOOOOOOOOOOOOL!")
+#     xo.cool = "FUCK YEA"
+#     xo.test()
+#     return xo.pnr(" ...... last mqtt was"+str(xo.mqtt.value()))
 
+# cmdDict = {"saveAt":"mqtt.incoming","run":lambda *args, **kw: print(f" ::: X Injected {[args,kw]}")},
+def package(data, cmdDict = None, saveAt = None, run = None, subscribe = None,  *args, **kw):
+    # if cmdDict is None:
+    #     cmdDict = {"saveAt":"mqtt.incoming","run":lambda *args, **kw: print(f" ::: X Injected {[args,kw]}")},
+    # print(f"!!!!!!!!!!,cmdDict{cmdDict}")
+    pack = {}
+    pack["cmdDict"] = cmdDict
+    if pack["cmdDict"] is None or "dict" not in str(type(pack["cmdDict"])):
+        pack["cmdDict"] = {}
 
-# class github():
-def shortRepo(url):
-	if ".com" in url:
-		return ("_".join(url.split('.com/')[-1].split("/")[:2]))#.replace("/","_")
-	return url
+    if saveAt is not None:
+        pack["cmdDict"]["saveAt"] = saveAt
+    if run is not None:
+        pack["cmdDict"]["run"] = run
+    if subscribe is not None:
+        pack["cmdDict"]["subscribe"] = subscribe
 
-def longRepo(url):
-	if ".com" not in url:
-		return "https://github.com/"+url.replace(".","/").replace("_","/") + "/"
-	return url
-
-def fetchLastUpdate(url):
-	response = requests.get(url).text
-	if response is not None and len(response) > 0:
-		# print("!!!"+response)
-		dateStr = None
-		try:
-			if "<updated>" in response:
-				dateStr = response.split("<updated>")[1].split("</updated>")[0]
-		except:
-			print()
-			print("URL",url)
-			print("300 chars or response:", response[:300])
-			print()
-			traceback.print_exc()
-		return dateStr
-	return None
-
-#!!!!!!!!
-
-def checkForUpdates(delay = 0.5, callback = lambda a: print("Repo was updated!",a)):
-	finishURL = "commits/master.atom"
-	print("\n ::: Checking Github for updates, if you wish hto stop, enter:\n ::: xo.watcher.run = False\n")
-	xo.watcher.run = True
-	xo.watcher.subscribed = []
-	while (xo.watcher.run == True):
-		repos = []
-		for repo in xo.watcher.repos.value():
-			repos.append(repo)
-		subscribed = xo.watcher.subscribed.value()
-		changed = False
-		for repo in repos:
-			short = shortRepo(repo)
-			if repo not in subscribed:
-				subscribed.append(repo)
-				channel = "watcher.repos."+short
-				# xo.subscribe(channel, callback, withID=True)
-				xo[channel].subscribe(callback, withID=True)
-				#Subscribe to autoPub
-				changed = True
-		if changed:
-			xo.watcher.subscribed = subscribed
-		for repo in repos:
-			short = shortRepo(repo)
-			lastUpdate = xo.watcher.repos[short].value()
-			new = fetchLastUpdate(repo+finishURL)
-			if new is not None and len(new) > 0 and new != lastUpdate:
-				xo.watcher.repos[short] = new
-				print(" ::: ID:",xo.watcher.repos[short]._id)
-			else:
-				pass
-				# print("same",repo)
-			time.sleep(delay)
-
-def handleRepoChange(data):
-	print("##################################")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("##################################")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print(data)
-	data, xoKey = data
-	print(xoKey, data)
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("##################################")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("##################################")
-
-def watchGithubRepo(repo, callback):
-	# print("##################################G")
-	# if xo.watcher.repos is None:
-	# 	xo.watcher.repos = []
-	while(xo.watcher.repos.value() is None):
-		xo.watcher.repos = []
-		time.sleep(1)
-	if repo not in xo.watcher.repos.value():
-		xo.watcher.repos.value().append(repo)
-	checkForUpdates(callback = callback)
-	print("Done Checking for repo changes")
-	return None
+    for k in kw:
+        pack["cmdDict"][k] = kw[k]
 
 
 
 
-def gitPull(data):
-	data, xoKey = data
-	print("PULLING CHANGES FROM",xoKey)
-	watcherKey = xoKey.split(".")[-1]
-	print()
-	print("PULLING",watcherKey)
-	print()
+    pack["data"] = data
+    pack["args"] = args
+    pack["kw"] = kw
 
-	xo.GetXO("watcher.repos", allow_creation=True).show()
-	print("SSwatcherKeyTT",watcherKey)
-	clonePath = xo.GetXO(watcherKey)["clonePath"].value()
-	print("Loading repo",clonePath)
-	repo = Repo(clonePath)
-	print("found repo",repo)
-	o = repo.remotes.origin
-	print("found origin",o)
-	res = o.pull()
-	xo.GetXO(watcherKey)["lastPull"] = res
-	print("::: Pull Finished - Info saved in", (watcherKey+"."+"lastPull").replace("/","."), res)
+    return pk.dumps(pack)
 
+def on_message(client, userdata, msg):
+    mqttChannel = msg.topic
+    # print("USERDATA",userdata)
+    msgData = {}
+    for key in ["topic","payload","timestamp"]:
+        msgData[key] = msg.__getattribute__(key)
+    if "payload" in msgData:
+        # user, payload = msgData["payload"]
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!", msgData["payload"])
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!", payload)
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!", user)
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!")
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!")
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!")
 
-
-def syncRepo(repo = "https://github.com/fire17/AlphaENG/"):
-	### GIT CLONE IF NOT THERE
-	short = shortRepo(repo)
-	clonePath = xo.home.value() + short
-	print("SHORT",short,clonePath)
-
-	xo.GetXO("watcher.repos."+short, allow_creation = True)["clonePath"] = clonePath
-
-	repoExists = PATH.exists(clonePath)
-	if not repoExists:
-		gitUrl = repo + ""
-		if not gitUrl.endswith(".git"):
-			if gitUrl.endswith("/"):
-				gitUrl = gitUrl[:-1]
-			gitUrl += ".git"
-
-		print("\n ::: Cloning",gitUrl,"to",clonePath, )
-		print("\n ::: If you're having issues, please clone manually with the following :::")
-
-		repoName = '/'.join(clonePath.split('/')[-1:])
-		cmd = f"cd {'/'.join(clonePath.split('/')[:-1])}"
-		cmd += f" && rm -rf {repoName}"
-		# cmd += f" && mkdir {'/'.join(clonePath.split('/')[-1:])}"
-		cmd += f" && git clone {gitUrl} {repoName}"
-		print(f" ::: {cmd} \n")
-		# Repo.clone_from(gitUrl , clonePath, progress=CloneProgress())
-		print("\n ::: Depending on the repo this can take a while :::")
-		tc = time.time()
-		Repo.clone_from(gitUrl , clonePath, branch="master", progress=CloneProgress())
-		# git.Git(clonePath).clone(gitUrl, progress=CloneProgress())
-		# os.makedirs(clonePath)
-		# git.Git("/".join(clonePath.split("/")[:-1])).clone(gitUrl)
-
-		# Repo.clone_from("git@github.com:"+gitUrl.strip("https://").strip("http://") , clonePath, branch="master")
-		# git.Git("/your/directory/to/clone").clone(path = "git://gitorious.org/git-python/mainline.git", progress=CloneProgress())
-
-		print(" ::: Cloning Finished. Time:",time.time()-tc,"\n")
-		repoExists2 = PATH.exists(clonePath)
-		if not repoExists2:
-			print(gitUrl, "COULD NOT BE CLONED.................",)
-		else:
-			print(" ::: SYNC :::", gitUrl.replace("https://", "").replace("http://", ""), "Was Clones Succesfully into",clonePath)
-	else:
-		print(" ::: No need to clone",short," - ",clonePath, "already exists!")
-		# os.makedirs(clonePath)
-	### GIT PULL IF UPDATED
-	# print("\n 1. watching repo for updates")
-	xo.watcher.watchRepo(repo, gitPull)
-	print(" ::: SYNC ::: Watching for github changes in",repo)
-	# print("DONE.......")
+        try: ## unpackaging msg
+            user,pid, bin= unpackage(msg)
+            if str(pid) == str(os.getpid()):
+                print(" ::: MQTT Message Published successfully ")
+                print()
+                pass # SKIP !
+            else:
+                print()
+                print(f" ::: Incoming New MQTT Message on Channel \"{msgData['topic']}\" :::")#" ::: From User {user}")
+                # print()
+                user,pid, data = unpackage(msg, body = True)
+                msgData["payload"] = {"user":user,"data":data}
+        except :
+            print()
+            print(f" ::: Exception while unpackaging msg ::: Binary data was saved to xo.mqtt.{user}.bin")
+            print(f" ::: To enable exeption prints use xo.settings.debug = True")
+            print()
+            if xo.settings.debug == True:
+                print()
+                traceback.print_exc()
+            print()
 
 
-	# GIT PUSH IF LOCAL CHANGES
-	# print()
-	print(" ::: SYNC ::: Watching for file changes in",clonePath)
-	# print("checking for changes.......")
-	xo.watcher.watchFiles(clonePath, "watcher.repos."+short, xo)
-	print(" ::: SYNC ::: Syncing Repo :::", short)
-	return True
+        # print("UUUUUUUUUUUUUUUUUUUU",user)
+        # print("UUUUUUUUUUUUUUUUUUUU",user)
+        # print("UUUUUUUUUUUUUUUUUUUU",user)
+        # print("UUUUUUUUUUUUUUUUUUUU",user)
+    saveAt = xo.mqtt.settings[mqttChannel].value()
+    xo.SetValue(saveAt, msgData)
+    # print()
+    # print(" ::: New MQTT Message ::: ")
+    # print(f" ::: Msg Data :::",msgData["payload"],"::: saved to",saveAt)
+    # print()
 
-def watchR(repo, callback = handleRepoChange):
-	watchR = "3333333"
-	xo.watcher.githubWatch = watchGithubRepo
-	xo.watcher.githubWatch(repo, callback, asyn = True)
-
-def syncR(repos = "https://github.com/fire17/AlphaENG/"):
-	if "list" not in str(type(repos)):
-		repos = [repos]
-
-	xo._syncR = syncRepo
-	for repo in repos:
-		xo._syncR(repo, asyn = True)
-	print("RRR returning from syncR")
-	return True
+    # xo.res = [msg.payload]  # until i read the channel name then ; xo.mqtt.settings[]
+    # print("::: MQTT Channel MSG A" + str(xo.res))
+    # print("::: MQTT Channel MSG B" + str(msg.payload.decode()))
+    # client.subsc1ribe(xo.mqtt.mainKey.value())
+    # print("Message Recieved. ", msg.payload.decode())
 
 
-def changed(data):
-	print("UUUUUUUUUUUUUUUUUUUUUUUUUUU")
-	print("UUUUUUUUUUUUUUUUUUUUUUUUUUU",data)
-	repoPath, event = data
-	print("::::",  event)
-	print("UUUUUUUUUUUUUUUUUUUUUUUUUUU")
-	repo = Repo(repoPath)
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	repo.git.pull()
-	repo.git.add(".")
-	repo.git.commit("-m","autoCOMMIT"+str(event))
-	repo.git.push()
-	print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ DONE!")
+def unpackage(msg, body = False):
+    if "xo.obj" in str(type(msg)):
+        msg = msg.value()
+
+    if not body:
+        return unpackageID(msg)
+    else:
+        username, pid,bin = unpackageID(msg)
+        pid = str(pid)
+        # username = user
+        knownUser = False
+        for c in xo.mqtt.users.children():
+            if username == c:
+                username = xo.mqtt.users[c].value()
+                knownUser = True
+
+        # if user in xo.mqtt.users.children():
+        #     username = xo.mqtt.users[user].value()
+        xo.mqtt[username].bin = bin
+        display = str(username)
+        if not knownUser:
+            display = "User "+display
+        elif str(pid) == str(display):
+            username = xo.mqtt.users[pid].value()
+            display = str(username)
+        print(f" ::: From {display} ::: len(data) is {len(bin)} ::: Binary saved to xo.{xo.mqtt[username].bin._id.replace('/','.')}")
+        return [username, pid ,unpackageBody(bin)]
+
+
+def unpackageID(msg):
+    if "xo.obj" in str(type(msg)):
+            msg = msg.value()
+    # print("ggggggg")
+    # print("ffffff bin",bin)
+    bin = msg.payload
+    ob = pk.loads(bin)
+    if "list" in str(type(ob)):
+        user, pid, data = ob
+        return user, pid, data
+        # print("@@@@@@@@@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@@@@@@@@@")
+        # print("@@@@@@@@@@@@@@@@@@@@@")
+    return "???"
+
+def unpackageBody(data):
+    if "xo.obj" in str(type(data)):
+        msg = msg.value()
+    # print("ggggggg")
+    bin = data
+    # print("ffffff")
+    ob = pk.loads(bin)
+    # print("eeeeee")
+    triggered = False
+    if ob is not None and "dict" in str(type(ob)):
+        # print("dddddd",ob)
+        if "cmdDict" in ob:
+            # print(type(xo.f.children()),"ccccccc",xo.f.children())
+            # print("CCCCCCCCCCCCCCCCCC")
+            # print()
+            for key in ob["cmdDict"]:
+                # print("KEY IS",key)
+                # print("bbbbbb",key, key in xo.f.children())
+                if key in xo.f.children():
+                    # print(f" ::: ::: Running func {key}")
+                    triggered = True
+                    try:
+                        xo.f[key]([ob["data"],ob["cmdDict"], ob["args"], ob["kw"]]) # runs function (packList)
+                    except :
+                        print()
+                        print(f" ::: Exception while running func {key} from mqtt")
+                        print(f" ::: To enable exeption prints use xo.settings.debug = True")
+                        print()
+                        if xo.settings.debug == True:
+                            print()
+                            traceback.print_exc()
+                        print()
+                    # change to append to xo.mqtt.updates
+    if not triggered:
+        print(f" ::: MSG ::: {ob['data']}")
+    return ob
 
 
 
-# def cloneRepo(repo = "https://github.com/fire17/AlphaENG"):
-def cloneRepo(repo = "https://github.com/fire17/Projects"):
-	xo._cloneCommand = cloneCommand
-	xo._cloneCommand(repo, asyn = True)
-	# xo._clone = callCommand:
-	# xo._clone([repo, ], asyn = True)
+def saveAt(data, appenD = False):
+    # print(" ::: Injected Save ::: ")
+    data, cmdDict, args, kw = data
+    correct = False
+    if "saveAt" in cmdDict and cmdDict["saveAt"] is not None:
+        print(f" ::: Save Request ::: {cmdDict['saveAt']} ::: {data}")
+        if not appenD:
+            xo.GetXO(cmdDict["saveAt"], allow_creation=True).set(data)
+        else:
+            o = xo.GetXO(cmdDict["saveAt"], allow_creation=True)
+            o += data
+        correct = True
+    else:
+        print(" ::: wwtf saveAt ::: ")
+    print()
+    return correct
+xo.f.saveAt = saveAt
 
+def appenD(data):
+    # print(" ::: Injected Save ::: ")
+    data, cmdDict, args, kw = data
+    correct = False
+    if "saveAt" in cmdDict and cmdDict["saveAt"] is not None:
+        print(f" ::: Save Request ::: {cmdDict['saveAt']} ::: {data}")
+        xo.GetXO(cmdDict["saveAt"], allow_creation=True).set(data)
+        correct = True
+    else:
+        print(" ::: wwtf saveAt ::: ")
+    print()
+    return correct
 
-xo.f.cloneRepo = cloneRepo
-xo.watcher.watchFiles = watchF
-xo.watcher.watchRepo = watchR
-xo.watcher.syncRepos = syncR
+xo.f.append = appenD
+
+def subscribe(data):
+    # print(" ::: Injected Subscribe ::: ")
+    correct = False
+    data, cmdDict, args, kw = data
+    print()
+    print(f" ::: Subscribe Request ::: {cmdDict['subscribe']} ::: {data}")
+    if "subscribe" in cmdDict and cmdDict["subscribe"] is not None:
+        f = lambda *a,**b: print(f" ::: Subscribed to {cmdDict['subscribe']} with Injection ::: ")
+        if "run" in cmdDict and cmdDict["run"] is not None and "func" in str(type(cmdDict["run"])):
+            f = cmdDict["run"]
+        xo.subscribe(cmdDict["subscribe"],f)
+        correct = True
+    else:
+        print(" ::: wwtf subscribe ::: ")
+    return correct
+
+# print("AAAAAAAAAAAA")
+xo.f.subscribe = subscribe
+
+def listen(data):
+    # print(" ::: Injected Subscribe ::: ")
+    correct = False
+    data, cmdDict, args, kw = data
+    print()
+    print(f" ::: Subscribe To MQTT Request ::: {cmdDict['listen']} ::: {data}")
+    if "listen" in cmdDict and cmdDict["listen"] is not None:
+        channel = cmdDict["listen"]
+        f = None
+        if "run" in cmdDict and cmdDict["run"] is not None and "func" in str(type(cmdDict["run"])):
+            f = cmdDict["run"]
+            print(f" ::: Subscribing to MQTT Channel \"{channel}\" With Function {f}")
+
+        autoPub = "mqtt.res"
+        if "saveAt" in cmdDict and cmdDict["saveAt"] is not None:# and "func" in str(type(cmdDict["run"])):
+            autoPub = cmdDict["saveAt"]
+            print(f" ::: MQTT Channel \"{channel}\" will be saved at {autoPub}")
+
+        sub(channel, f, autoPub)
+        correct = True
+    else:
+        print(" ::: wwtf subscribe ::: ")
+    return correct
+
+# print("AAAAAAAAAAAA")
+xo.f.listen = listen
+
+def run(data):
+    data, cmdDict, args, kw = data
+    print()
+    print(f" ::: Run Request ::: {cmdDict['run']} ::: {data}")
+    correct = False
+    # f = lambda *a,**b: print(f" ::: Subscribed to {cmdDict["subscribe"]} with Injection ::: ")
+    if "run" in cmdDict and cmdDict["run"] is not None and "func" in str(type(cmdDict["run"])):
+        f = cmdDict["run"]
+        nA = [data]
+        for a in args:
+            nA.append(a)
+        # list(args).append(data)
+        correct = False
+        f(data, *args, **kw)
+    else:
+        print(" ::: wwtf run ::: ")
+    return correct
+
+# print("BBBBBBBBBb")
+xo.f.run = run
+
+if xo.settings.auto == True:
+    sub()
+# print("ccccc")
+
+# xo.mqtt.onconnect = on_connect
+# # xo.mqtt.on_message = on_message
+# mqtt = xo.mqtt
+xo.a.b.c.d.e = 10
+xo.pid = os.getpid
