@@ -78,21 +78,23 @@ def sub(mqttChannel = None, func = None, autoPub = "mqtt"):
 
 #pub(package("AAAX", cmdDict = {"subscribe":"newValue","run":lambda a, *qa,**b:print(f" III new value is{xo.later}"), "saveAt":"newValue"}, yo = "YO YO"))
 # xo.mqtt.skip.time = 1
-def pub(data = None, mqttChannel = None, autoPackage = True, *ar ,**kw):
+def pub(data = None, mqttChannel = None, autoPackage = True, ping = False, *ar ,**kw):
+    du = 'PID ' + str(os.getpid())
+    if xo.mqtt.username.value() is not None:
+        du = xo.mqtt.username.value()
     if data is None:
-        du = 'PID ' + str(os.getpid())
-        if xo.mqtt.username.value() is not None:
-            du = xo.mqtt.username.value()
         data =f" @@@ Hello World! from {du}"
     msg = data
-
-
+    if ping:
+        data =f" @@@ Ping from {du}"
     if "bytes" not in str(type(data)) and autoPackage:
         data = package(data,*ar,**kw )
     if mqttChannel is None:
         mqttChannel = xo.mqtt.mainKey.value()
     kw["mqttChannel"] = mqttChannel
-    print(f" ::: Sending Data ::: {str(msg[:30])} ... to Channel \"{mqttChannel}\" ::: len(data) = {len(data)}\n")
+
+    if "silent" not in kw or kw["silent"] is not True:
+        print(f" ::: Sending Data ::: {str(msg[:30])} ... to Channel \"{mqttChannel}\" ::: len(data) = {len(data)}\n")
     if xo.log.value() == True or True:
         xo.log += f"Sending data to \"{mqttChannel}\""
     client = mqtt.Client()
@@ -103,10 +105,13 @@ def pub(data = None, mqttChannel = None, autoPackage = True, *ar ,**kw):
     username = str(os.getpid())
     if xo.mqtt.username.value() is not None:
         username = xo.mqtt.username.value()
-
-    client.publish(mqttChannel, pk.dumps([username,str(os.getpid()),data]));
+    ##########
+    final = [username,str(os.getpid()), kw, data]
+    client.publish(mqttChannel, pk.dumps(final));
     client.loop_start()
     # client.disconnect();
+
+
 
 # def cool():
 #     print("COOOOOOOOOOOOOOL!")
@@ -157,28 +162,34 @@ def on_message(client, userdata, msg):
         # print("!!!!!!!!!!!!!!!!!!!!!!!!")
         # print("!!!!!!!!!!!!!!!!!!!!!!!!")
         # print("!!!!!!!!!!!!!!!!!!!!!!!!")
-
+        user = "unknown"
+        silent = False
         try: ## unpackaging msg
-            user,pid, bin= unpackage(msg)
+            user,pid,params, bin= unpackage(msg)
+            if "silent" in params and params["silent"] == True:
+                silent = True
             if str(pid) == str(os.getpid()):
-                print(" ::: MQTT Message Published successfully ")
-                print()
-                pass # SKIP !
+                if not silent:
+                    print(" ::: MQTT Message Published successfully ")
+                    print()
+                pass # SKIP self-sent message!
             else:
-                print()
-                print(f" ::: Incoming New MQTT Message on Channel \"{msgData['topic']}\" :::")#" ::: From User {user}")
+                if not silent:
+                    print()
+                    print(f" ::: Incoming New MQTT Message on Channel \"{msgData['topic']}\" :::")#" ::: From User {user}")
                 # print()
-                user,pid, data = unpackage(msg, body = True)
+                user,pid,params, data = unpackage(msg, body = True)
                 msgData["payload"] = {"user":user,"data":data}
         except :
-            print()
-            print(f" ::: Exception while unpackaging msg ::: Binary data was saved to xo.mqtt.{user}.bin")
-            print(f" ::: To enable exeption prints use xo.settings.debug = True")
-            print()
-            if xo.settings.debug == True:
+            if not silent:
                 print()
-                traceback.print_exc()
-            print()
+                print(f" ::: Exception while unpackaging msg ::: Binary data was saved to xo.mqtt.{user}.bin")
+                print(f" ::: To enable exeption prints use xo.settings.debug = True")
+                print()
+                if xo.settings.debug == True:
+                    print()
+                    traceback.print_exc()
+                print()
 
 
         # print("UUUUUUUUUUUUUUUUUUUU",user)
@@ -204,9 +215,9 @@ def unpackage(msg, body = False):
         msg = msg.value()
 
     if not body:
-        return unpackageID(msg)
+        return unpackageL1(msg)
     else:
-        username, pid,bin = unpackageID(msg)
+        username, pid, params,bin = unpackageL1(msg)
         pid = str(pid)
         # username = user
         knownUser = False
@@ -224,11 +235,12 @@ def unpackage(msg, body = False):
         elif str(pid) == str(display):
             username = xo.mqtt.users[pid].value()
             display = str(username)
-        print(f" ::: From {display} ::: len(data) is {len(bin)} ::: Binary saved to xo.{xo.mqtt[username].bin._id.replace('/','.')}")
-        return [username, pid ,unpackageBody(bin)]
+        if "silent" not in params:
+            print(f" ::: From {display} ::: len(data) is {len(bin)} ::: Binary saved to xo.{xo.mqtt[username].bin._id.replace('/','.')}")
+        return [username, pid, params ,unpackageBody(bin)]
 
 
-def unpackageID(msg):
+def unpackageL1(msg):
     if "xo.obj" in str(type(msg)):
             msg = msg.value()
     # print("ggggggg")
@@ -236,8 +248,8 @@ def unpackageID(msg):
     bin = msg.payload
     ob = pk.loads(bin)
     if "list" in str(type(ob)):
-        user, pid, data = ob
-        return user, pid, data
+        user, pid, params, data = ob
+        return user, pid, params, data
         # print("@@@@@@@@@@@@@@@@@@@@@")
         # print("@@@@@@@@@@@@@@@@@@@@@")
         # print("@@@@@@@@@@@@@@@@@@@@@")
@@ -280,7 +292,7 @@ def unpackageBody(data):
                         print()
                     # change to append to xo.mqtt.updates
     if not triggered:
-        print(f" ::: MSG ::: {ob['data']}")
+        print(f" ::: DATA ::: {ob['data']}")
     return ob
 
 
@@ -366,8 +378,15 @@ xo.f.listen = listen
 
 def run(data):
     data, cmdDict, args, kw = data
-    print()
-    print(f" ::: Run Request ::: {cmdDict['run']} ::: {data}")
+    if not ("silent" in kw and kw["silent"] is True):
+        print()
+        print(f" ::: Run Request ::: {cmdDict['run']} ::: {data}, ", )
+    else: # silent
+        pass # does not print
+        # print("@@@@@@@@@@@@@@@@@@@@")
+        # print(kw)
+        # print("@@@@@@@@@@@@@@@@@@@@")
+
     correct = False
     # f = lambda *a,**b: print(f" ::: Subscribed to {cmdDict["subscribe"]} with Injection ::: ")
     if "run" in cmdDict and cmdDict["run"] is not None and "func" in str(type(cmdDict["run"])):
@@ -382,8 +401,62 @@ def run(data):
         print(" ::: wwtf run ::: ")
     return correct
 
-# print("BBBBBBBBBb")
 xo.f.run = run
+
+def chat():
+    print()
+    print(f" ::: Entering chat \"{xo.mqtt.mainKey.value()}\"","\n ::: Type your message and press enter to send\n ::: exit() or Ctrl+C to leave\n")
+    stop = False
+    username = str(os.getpid())
+    if xo.mqtt.username.value() is not None:
+        username = xo.mqtt.username.value()
+    while(not stop):
+        try:
+
+            # print("                                                          \n                                                            "
+            # +"\n ("+username+"): ",end='')
+            print("                                    "#"                                                          \n                                                            "
+            +"\n ("+username+"): ",end='')
+            res = input()
+            print(chr(27)+"[1A"+"\033[F"+f" ::: {username} : {res}")
+            if res is "exit" or res is "exit()":
+                stop = True
+            else:
+                xo.msg(res, chat = True, prev = chr(27)+"[2A\n"+"",after = chr(27)+"[1A\n\n")
+                # xo.msg(res, chat = True, prev = chr(27)+"[2A\033[F"+"\033[F"+"\033[F\n\n\n")
+                # xo.msg(res, chat = True, prev = "")
+        except:
+            traceback.print_exc()
+            stop = True
+xo.chat = chat
+
+def ping(msg = "hello from the other side", data = None, *ar, **kw):
+    xo.pub(ping = True, run = lambda *a,**aa:xo.pub("hello from the other side"))
+
+xo.ping = ping
+
+def _remoteCMD(cmd, *ar, **kw):
+    xo.pub(ping = True, run = lambda *a,**aa:xo.cmd(cmd))
+
+xo._remoteCMD = _remoteCMD
+
+def msg(msg = "", title = None, *ar, **kw):
+    username = str(os.getpid())
+    if xo.mqtt.username.value() is not None:
+        username = xo.mqtt.username.value()
+    if not title:
+        title = "Msg from "+username+" ::: "
+    prev,after = "",""
+    if "chat" in kw:
+        if "prev" in kw:
+            prev = kw["prev"]
+        if "after" in kw:
+            after = kw["after"]
+            # print("pppppppppppppppppppp")
+    xo.pub(data = title, run = lambda *a,**aa:xo.pnr(prev+f" ::: {username}: "+msg+after), silent = True)
+
+xo.msg = msg
+# print("BBBBBBBBBb")
 
 if xo.settings.auto == True:
     sub()

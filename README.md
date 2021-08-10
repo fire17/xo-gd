@@ -1,4 +1,4 @@
-### XObject + GlobalData - Version 3.2.3 - Startlight✨ MQTT-HEAVEN
+### XObject + GlobalData - Version 3.2.3.2 - Startlight✨ MQTT-HEAVEN
 # _xObject + Global Data_ <br>Use Python Like You Never Have Before ! <br>
 ### _Easy Acces To:_
 ## 🔔 Events and Triggers <br> 💛 Realtime MultiProcessing <br> 🏃 Instant Dynamic DB <br> 📁 Filesytem & Web Watchdog <br> 🌐 Sockets, MQTT, P2P, API Server <br> ⚡ Supports Fast Prototyping To Large Scale Systems <br><br>
@@ -6,7 +6,7 @@
 xo-gd
 ===============================
 
-version number: 3.2.3 MQTT HEAVEN
+version number: 3.2.3.2 MQTT HEAVEN
 author: Tami Bar
 
 Overview
