@@ -40,7 +40,7 @@ password: xxx
 
 #########################################
 Commit
-python setup.py sdist
+python3.7 setup.py sdist
 Commit
 git tag 3.2.3 -m 'pip install xo-gd -U'
 git push
