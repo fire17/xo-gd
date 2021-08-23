@@ -22,8 +22,7 @@ class MyHandler(FileSystemEventHandler):
 	# FFF.mro(           FFF.on_closed(     FFF.on_deleted(    FFF.on_moved(
 
 
-# xo.subscribe('/home/magic/AlphaENG/data' ,lambda *a,**aa:print("aaaaaaaaaaa",a,aa))
-
+# xo.subscribe('/home/magic/AlphaENG/data' ,lambda *a,**aa:"###################### YEA ##","aa")
 	def on_modified(self, event):
 		interesting = True
 		skip = False
@@ -48,10 +47,15 @@ class MyHandler(FileSystemEventHandler):
 					self.last_modified[1] += [event.src_path]
 				else:
 					self.last_modified[1] = [event.src_path]
+			# # print("PPPPPPP",self.autoPub)
 			# print("PPPPPPP",self.autoPub)
-			auto = self.xo.GetXO(self.autoPub)
-			auto["changes"] = event.src_path
-			print(f" ::: File/Folder Modified ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			# print("PPPPPPPPPP",self.xo.GetXO(self.autoPub))
+			self.xo.GetXO(self.autoPub,allow_creation=True).set(event.src_path)
+			# # self.xo.GetXO(self.autoPub+".changes",allow_creation=True).set(event.src_path)
+			# print("PPPPPPPPPP",self.xo.GetXO(self.autoPub))
+			#
+			# self.xo.GetXO(self.autoPub).SetValue(event.src_path)
+			print(f" ::: File/Folder Modified ::: xo.{self.autoPub.replace('/','.')} :::",event.src_path)
 			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
 			# print(f'Event type: {event.event_type}  path : {event.src_path}')
 			# print(event.is_directory) # This attribute is also available
@@ -73,10 +77,11 @@ class MyHandler(FileSystemEventHandler):
 				return
 			else:
 				self.last_modified[0] = datetime.now()
-			# print("PPPPPPP",self.autoPub)
-			auto = self.xo.GetXO(self.autoPub)
-			auto["changes"] = event.src_path
-			print(f" ::: File/Folder Created ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			print("PPPPPPP",self.autoPub)
+			print("PPPPPPPPPP",self.xo.GetXO(self.autoPub))
+			self.xo.GetXO(self.autoPub).SetValue(event.src_path)
+			print("PPPPPPPPPP",self.xo.GetXO(self.autoPub))
+			print(f" ::: File/Folder Created ::: xo.{self.autoPub.replace('/','.')} :::",event.src_path)
 			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
 			# print(f'Event type: {event.event_type}  path : {event.src_path}')
 			# print(event.is_directory) # This attribute is also available
@@ -101,7 +106,7 @@ class MyHandler(FileSystemEventHandler):
 			# print("PPPPPPP",self.autoPub)
 			auto = self.xo.GetXO(self.autoPub)
 			auto["changes"] = event.src_path
-			print(f" ::: File/Folder Moved ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			print(f" ::: File/Folder Moved ::: xo.{self.autoPub.replace('/','.')} :::",event.src_path)
 			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
 			# print(f'Event type: {event.event_type}  path : {event.src_path}')
 			# print(event.is_directory) # This attribute is also available
@@ -126,7 +131,7 @@ class MyHandler(FileSystemEventHandler):
 			# print("PPPPPPP",self.autoPub)
 			auto = self.xo.GetXO(self.autoPub)
 			auto["changes"] = event.src_path
-			print(f" ::: File/Folder Deleted ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			print(f" ::: File/Folder Deleted ::: xo.{self.autoPub.replace('/','.')} :::",event.src_path)
 			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
 			# print(f'Event type: {event.event_type}  path : {event.src_path}')
 			# print(event.is_directory) # This attribute is also available
@@ -136,14 +141,16 @@ class MyHandler(FileSystemEventHandler):
 # xo.mock.interested.ignore = ["~"]
 
 #test
+# xo.subscribe('/home/magic/AlphaENG/data' ,lambda *a,**aa:"###################### YEA ##","aa")
 
-def watchFiles(path, callback, xoKey, xo):
+def watchFiles(path, callback, xoKey, xo, resID = None):
 	# if not xoKey.endswith(".changes"):
 	# 	xoKey += ".changes"
 	# print("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",path,callback,xoKey)
+	# xoKey += ".changes"
 	event_handler = MyHandler(path, xoKey, xo)
 	observer = Observer()
-	xo.GetXO(xoKey + ".changes",allow_creation=True).subscribe(callback)
+	xo.GetXO(xoKey,allow_creation=True).subscribe(callback, autoPub = xoKey.split(".changes")[0])
 
 	# cwd = os.getcwd()
 	print("Watching Files:",path, xoKey, callback)
@@ -158,10 +165,10 @@ def watchFiles(path, callback, xoKey, xo):
 	observer.join()
 
 # 2
-def watchF(path, callback, xoKey, xo):
+def watchF(path, callback, xoKey, xo, res = None):
 	# print("KKKKKKKKKKKKKK",xoKey)
-	xo._watchFile = watchFiles
-	xo._watchFile(path, callback, xoKey, xo, asyn=True)
+	# xo._watchFile = watchFiles
+	xo.asyn(watchFiles, path, callback, xoKey, xo, resID = res)
 
 
 '''

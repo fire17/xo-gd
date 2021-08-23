@@ -9,7 +9,7 @@
 # print(" :::    import xo; xo = ok()")
 # print()
 
-print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+# print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
 from .gd import *
 # xo = xo.ok()
 

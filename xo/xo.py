@@ -1389,7 +1389,9 @@ class ok(object):
 					# fW.watchF(path = path, callback = func, xoKey = autoPub, xo = self)
 					if autoPub is None or autoPub == "":
 						autoPub = "watch."+os.path.basename(path)
-					watchF(path = path, callback = func, xoKey = autoPub, xo = self)
+						channel = autoPub
+
+					watchF(path = path, callback = func, xoKey = autoPub+".changes", xo = self, res = autoPub)
 				return True
 
 				pass
@@ -1438,13 +1440,17 @@ class ok(object):
 		# if self.lowerCase:
 		# 	channel = channel.lower()
 		# print("__________-")
+
+		# print("AAAAAAAAAAAAAAA",autoPub)
 		run = True
 		newdata = None
 		while run:
 		# for ccc in range(4):
 			# time.sleep(1)
 			run = not once
+			# print("CCCCCCCCCCCC",channel)
 			data = self.__awaitChannelUpdate(channel)
+			# print("CCCCCCCCCCCC2222")
 			# print("@@@@@@@@@@@@")
 			if not debug:
 				try:
@@ -1459,15 +1465,17 @@ class ok(object):
 					newdata = func([data,channel])
 				else:
 					newdata = func(data)
-			# self.printF("############")
+			# print("############",newdata,"@@@@@@@",autoPub)
 			if autoPub is not None:
 				if type(autoPub) is list:
 					for pb in autoPub:
 						print(f" ::: Processed new data in {channel.replace('/','.')} ::: Results saved in {pb} ::: \n :::   {pb} Data:   :::\n{newdata}\n\n")
-						self._publish(pb,newdata)
+						# self._publish(pb,newdata)
+						self.GetXO(pb).set(newdata)
 				else:
 					print(f" ::: data from {channel} was procced in {func} and the results autoPubish to",autoPub, ":::")
-					self._publish(autoPub,newdata)
+					# self._publish(autoPub,newdata)
+					self.GetXO(autoPub).set(newdata)
 			else:
 				pass
 				#print("autoPub is None")
