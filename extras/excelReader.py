@@ -1,6 +1,7 @@
 # importing module
 import csv
-from gd import *
+# from gd import *
+from xo import *
 import traceback
 
 def importCSV(filename="AEsales.csv", xoKeyForOutput = "mock.excels", saveToXO = True, display = True, maxDisplay = 6, pretty = True):

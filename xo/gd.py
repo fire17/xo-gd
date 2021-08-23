@@ -117,8 +117,8 @@ sub()
 
 xo.subscribe("mqtt.mainKey", sub)
 
-xo.sub = sub
-xo.pub = pub
+xo.msub = sub
+xo.mpub = pub
 
 xo.__version__ = "Starlight 3.2.1 MQTT HEAVEN "
 # print("ccccc")

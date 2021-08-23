@@ -59,7 +59,7 @@ def watchFiles(path, callback, xoKey, xo):
 	# print("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",path,callback,xoKey)
 	event_handler = MyHandler(path, xoKey, xo)
 	observer = Observer()
-	xo[xoKey + ".changes"].subscribe(callback)
+	xo.GetXO(xoKey + ".changes").subscribe(callback)
 
 	# cwd = os.getcwd()
 	print("Watching Files:",path, xoKey, callback)

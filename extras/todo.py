@@ -9,6 +9,17 @@ clean output
 .subscribe
 
 
+
+
+fix file and folders
+check ping(channel
+
+
+
+
+
+
+
 pypi template
 changedir
 

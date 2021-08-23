@@ -81,7 +81,7 @@ def sub(mqttChannel = None, func = None, autoPub = "mqtt"):
 
 #pub(package("AAAX", cmdDict = {"subscribe":"newValue","run":lambda a, *qa,**b:print(f" III new value is{xo.later}"), "saveAt":"newValue"}, yo = "YO YO"))
 # xo.mqtt.skip.time = 1
-def pub(data = None, mqttChannel = None, autoPackage = True, ping = False, *ar ,**kw):
+def pub(data = None, mqttChannel = None, autoPackage = True, ping = False, dump = False, *ar ,**kw):
     du = 'PID ' + str(os.getpid())
     if xo.mqtt.username.value() is not None:
         du = xo.mqtt.username.value()
@@ -91,7 +91,10 @@ def pub(data = None, mqttChannel = None, autoPackage = True, ping = False, *ar ,
     if ping:
         data =f" @@@ Ping from {du}"
     if "bytes" not in str(type(data)) and autoPackage:
-        data = package(data,*ar,**kw )
+        if dump:
+            data = package(data,*ar,**kw )
+        else:
+            data = str(data)
     if mqttChannel is None:
         mqttChannel = xo.mqtt.mainKey.value()
     kw["mqttChannel"] = mqttChannel
@@ -110,7 +113,10 @@ def pub(data = None, mqttChannel = None, autoPackage = True, ping = False, *ar ,
         username = xo.mqtt.username.value()
     ##########
     final = [username,str(os.getpid()), kw, data]
-    client.publish(mqttChannel, pk.dumps(final));
+    if dump:
+        client.publish(mqttChannel, pk.dumps(final));
+    else:
+        client.publish(mqttChannel, final);
     client.loop_start()
     # client.disconnect();
 
@@ -411,9 +417,18 @@ def chat(channel = None):
     if not (channel is None or channel == ""):
         cn = channel
     channel = cn
-    if channel not in xo.mqtt[str(xo.pid())].subscribedTo.value():
+    subs = xo.mqtt[str(xo.pid())].subscribedTo.value()
+    if subs is None:
+        xo.mqtt[str(xo.pid())].subscribedTo = []
+        xo.mqtt
+    if xo.mqtt[str(xo.pid())].subscribedTo.value() is not None and channel not in xo.mqtt[str(xo.pid())].subscribedTo.value():
         # print("............")
         sub(channel)
+    else:
+        print(f" ::: Problem with xo.mqtt[str(xo.pid())].subscribedTo.value() {xo.mqtt[str(xo.pid())].subscribedTo.value()}")
+        print(f" ::: subscribing to {channel} anyway...")
+        sub(channel)
+
     time.sleep(1)
 
     username = str(os.getpid())
@@ -436,8 +451,8 @@ def chat(channel = None):
     while(not stop):
         try:
             if channel not in xo.mqtt[str(xo.pid())].subscribedTo.value():
-                print("CCCCCCCCCC",channel)
-                print("CCCCCCCCCC",xo.mqtt[str(xo.pid())].subscribedTo.value())
+                # print("CCCCCCCCCC",channel)
+                # print("CCCCCCCCCC",xo.mqtt[str(xo.pid())].subscribedTo.value())
                 sub(channel)
                 if not (channel not in xo.mqtt[str(xo.pid())].subscribedTo.value()):
                     time.sleep(1)
