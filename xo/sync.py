@@ -54,7 +54,7 @@ def sub(mqttChannel = None, func = None, autoPub = "mqtt"):
         xo.mqtt.settings.newSub = mqttChannel
         # print()
         xo.mqtt.settings[mqttChannel] = autoPub
-        xo.subsc1ribe(autoPub,func)
+        xo.subscribe(autoPub,func)
         client = mqtt.Client()
         client.on_connect = on_connect
         client.on_message = on_message

@@ -49,7 +49,7 @@ password: xxx
 Commit
 python3.7 setup.py sdist
 Commit
-git tag 3.2.5 -m 'Subscribe to file/folder, mqtt mpub clean, reqs updated'
+git tag 3.2.7 -m 'Subscribe to file/folder, mqtt mpub clean, reqs updated'
 git push
 git push --tags
 twine upload -r pypitest dist/* && twine upload dist/*

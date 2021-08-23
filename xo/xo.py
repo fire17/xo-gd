@@ -1334,13 +1334,14 @@ class ok(object):
 		print("xxxxxxxxxxxxxxxxxx to be implemented SETTING DB TO:",dirname)
 		# xoManager = manager = newObjManager()
 
-	def _defFunc(self, data):
+	def _defFunc(self, *a, **aa):
 
-		data, channel = data
+		data = [a, aa]
 		print()
-		print(":::::::: "+channel+ "- incoming data ::::::::::::::::::::::::::::: "+time.ctime())
-		print(data)
-		print(":::::::: "+channel+ "- incoming data :::::::::::::::::::::::::::::")
+		print("::::::::  incoming data ::::::::::::::::::::::::::::: "+time.ctime())
+		print(f"::::::::  {a}, {aa} ::::::::::::::::::::::::::::: ")
+		# print(data)
+		# print(":::::::: "+channel+ "- incoming data :::::::::::::::::::::::::::::")
 		print()
 		return data
 # #
@@ -1386,6 +1387,8 @@ class ok(object):
 				# xo.subscribe(p, lambda a : print(" ::: File/Folder Changed :",a), "res")
 				if True:
 					# fW.watchF(path = path, callback = func, xoKey = autoPub, xo = self)
+					if autoPub is None or autoPub == "":
+						autoPub = "watch."+os.path.basename(path)
 					watchF(path = path, callback = func, xoKey = autoPub, xo = self)
 				return True
 

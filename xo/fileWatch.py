@@ -8,7 +8,7 @@ from watchdog.events import FileSystemEventHandler
 
 class MyHandler(FileSystemEventHandler):
 	def __init__(self, path, autoPub, xo, delta = 1):
-		self.last_modified = datetime.now()
+		self.last_modified = [datetime.now(), []]
 		# self.interested = xo.mock.interested.value()
 		self.ignore = ["~"]
 		self.interested = []
@@ -21,8 +21,11 @@ class MyHandler(FileSystemEventHandler):
 	# FFF.dispatch(      FFF.on_any_event(  FFF.on_created(    FFF.on_modified(
 	# FFF.mro(           FFF.on_closed(     FFF.on_deleted(    FFF.on_moved(
 
+
+# xo.subscribe('/home/magic/AlphaENG/data' ,lambda *a,**aa:print("aaaaaaaaaaa",a,aa))
+
 	def on_modified(self, event):
-		interesting = False
+		interesting = True
 		skip = False
 		if len(self.interested) == 0:
 			interesting = True
@@ -35,14 +38,95 @@ class MyHandler(FileSystemEventHandler):
 					interesting = True
 
 		if interesting:
-			if datetime.now() - self.last_modified < timedelta(seconds=self.delta):
+			if datetime.now() - self.last_modified[0] < timedelta(seconds=self.delta):
+				if event.src_path in self.last_modified[1]:
+					return
+				self.last_modified = [datetime.now(), self.last_modified[1] + [event.src_path]]
+			else:
+				self.last_modified[0] = datetime.now()
+				if event.src_path in self.last_modified[1]:
+					self.last_modified[1] += [event.src_path]
+				else:
+					self.last_modified[1] = [event.src_path]
+			# print("PPPPPPP",self.autoPub)
+			auto = self.xo.GetXO(self.autoPub)
+			auto["changes"] = event.src_path
+			print(f" ::: File/Folder Modified ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
+			# print(f'Event type: {event.event_type}  path : {event.src_path}')
+			# print(event.is_directory) # This attribute is also available
+	def on_createdx(self, event):
+		interesting = True
+		skip = False
+		if len(self.interested) == 0:
+			interesting = True
+		for i in self.interested:
+			if i in str(event.src_path):
+				for s in self.ignore:
+					if s in str(event.src_path):
+						skip = False
+				if not skip:
+					interesting = True
+
+		if interesting:
+			if False and datetime.now() - self.last_modified[0] < timedelta(seconds=self.delta):
+				return
+			else:
+				self.last_modified[0] = datetime.now()
+			# print("PPPPPPP",self.autoPub)
+			auto = self.xo.GetXO(self.autoPub)
+			auto["changes"] = event.src_path
+			print(f" ::: File/Folder Created ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
+			# print(f'Event type: {event.event_type}  path : {event.src_path}')
+			# print(event.is_directory) # This attribute is also available
+	def on_moved0(self, event):
+		interesting = True
+		skip = False
+		if len(self.interested) == 0:
+			interesting = True
+		for i in self.interested:
+			if i in str(event.src_path):
+				for s in self.ignore:
+					if s in str(event.src_path):
+						skip = False
+				if not skip:
+					interesting = True
+
+		if interesting:
+			if False and datetime.now() - self.last_modified < timedelta(seconds=self.delta):
 				return
 			else:
 				self.last_modified = datetime.now()
 			# print("PPPPPPP",self.autoPub)
 			auto = self.xo.GetXO(self.autoPub)
-			auto["changes"] = event.key
-			print(" ::: File/Folder Modified :::",event.key)
+			auto["changes"] = event.src_path
+			print(f" ::: File/Folder Moved ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
+			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
+			# print(f'Event type: {event.event_type}  path : {event.src_path}')
+			# print(event.is_directory) # This attribute is also available
+	def on_deleted0(self, event):
+		interesting = True
+		skip = False
+		if len(self.interested) == 0:
+			interesting = True
+		for i in self.interested:
+			if i in str(event.src_path):
+				for s in self.ignore:
+					if s in str(event.src_path):
+						skip = False
+				if not skip:
+					interesting = True
+
+		if interesting:
+			if False and datetime.now() - self.last_modified < timedelta(seconds=self.delta):
+				return
+			else:
+				self.last_modified = datetime.now()
+			# print("PPPPPPP",self.autoPub)
+			auto = self.xo.GetXO(self.autoPub)
+			auto["changes"] = event.src_path
+			print(f" ::: File/Folder Deleted ::: xo.{self.autoPub.replace('/','.')}.changes :::",event.src_path)
 			# print("!!!!!!!!!!! NEW CHANGES !!!!!!!!!!!!!!!!!!", self.autoPub+".changes" , event)
 			# print(f'Event type: {event.event_type}  path : {event.src_path}')
 			# print(event.is_directory) # This attribute is also available
@@ -59,7 +143,7 @@ def watchFiles(path, callback, xoKey, xo):
 	# print("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",path,callback,xoKey)
 	event_handler = MyHandler(path, xoKey, xo)
 	observer = Observer()
-	xo.GetXO(xoKey + ".changes").subscribe(callback)
+	xo.GetXO(xoKey + ".changes",allow_creation=True).subscribe(callback)
 
 	# cwd = os.getcwd()
 	print("Watching Files:",path, xoKey, callback)
